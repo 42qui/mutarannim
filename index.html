@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>مُترنِّم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#191830;
+    --ink-deep:#0F0E1F;
+    --gold:#C9A050;
+    --gold-soft:#E4C888;
+    --parchment:#EFE7D6;
+    --rose:#8B4A3B;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    background:var(--ink-deep);
+    color:var(--parchment);
+    font-family:'IBM Plex Sans Arabic',sans-serif;
+    overflow-x:hidden;
+  }
+  .verse-font{font-family:'Aref Ruqaa',serif;}
+
+  /* ---------- HERO ---------- */
+  .hero{
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    padding:2rem 1.5rem;
+    position:relative;
+    background:
+      radial-gradient(ellipse 80% 60% at 50% 20%, rgba(201,160,80,0.10), transparent),
+      var(--ink-deep);
+  }
+  .hero-mark{
+    font-size:clamp(2.2rem,6vw,3.2rem);
+    letter-spacing:0.02em;
+    color:var(--gold-soft);
+    margin-bottom:2rem;
+  }
+  .hero-verse{
+    font-family:'Aref Ruqaa',serif;
+    font-size:clamp(1.4rem,4.5vw,2.2rem);
+    line-height:1.9;
+    color:var(--parchment);
+    max-width:20ch;
+    min-height:1.9em;
+    position:relative;
+    display:inline-block;
+    clip-path:inset(0 0 0 100%);
+    animation:ink-reveal 1.8s cubic-bezier(.65,0,.35,1) forwards;
+    animation-delay:0.3s;
+  }
+  @keyframes ink-reveal{
+    to{clip-path:inset(0 0 0 0);}
+  }
+  .hero-tagline{
+    margin-top:2rem;
+    font-size:clamp(0.95rem,2vw,1.1rem);
+    color:var(--gold);
+    font-weight:400;
+    opacity:0;
+    animation:rise 1s ease-out forwards;
+    animation-delay:2.3s;
+  }
+  @keyframes rise{
+    from{opacity:0;transform:translateY(10px);}
+    to{opacity:1;transform:translateY(0);}
+  }
+  .hero-scroll{
+    position:absolute;
+    bottom:2.5rem;
+    font-size:0.85rem;
+    color:var(--parchment);
+    opacity:0;
+    animation:rise 1s ease-out forwards;
+    animation-delay:2.8s;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    gap:6px;
+  }
+  .hero-scroll .line{
+    width:1px;height:32px;
+    background:linear-gradient(var(--gold), transparent);
+  }
+
+  /* ---------- STORY ---------- */
+  .story{
+    max-width:640px;
+    margin:0 auto;
+    padding:8rem 1.5rem;
+    text-align:center;
+  }
+  .story p{
+    font-size:clamp(1.05rem,2.2vw,1.35rem);
+    line-height:2.1;
+    color:var(--parchment);
+    opacity:0.92;
+  }
+  .story p + p{margin-top:1.6rem;}
+  .story .accent-word{color:var(--gold-soft);}
+
+  /* ---------- FEATURES ---------- */
+  .features{
+    max-width:1000px;
+    margin:0 auto;
+    padding:4rem 1.5rem 8rem;
+  }
+  .features-intro{
+    text-align:center;
+    font-family:'Aref Ruqaa',serif;
+    font-size:clamp(1.4rem,3.5vw,2rem);
+    color:var(--gold-soft);
+    margin-bottom:3rem;
+  }
+  .feature-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+    gap:1px;
+    background:rgba(201,160,80,0.18);
+    border:1px solid rgba(201,160,80,0.18);
+  }
+  .feature-card{
+    background:var(--ink-deep);
+    padding:2rem 1.6rem;
+    cursor:pointer;
+    position:relative;
+    transition:background 0.4s ease;
+  }
+  .feature-card:hover{background:var(--ink);}
+  .feature-title{
+    font-size:1.05rem;
+    font-weight:500;
+    color:var(--parchment);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+  }
+  .feature-title .plus{
+    color:var(--gold);
+    font-size:1.3rem;
+    transition:transform 0.4s ease;
+    line-height:1;
+  }
+  .feature-card.open .plus{transform:rotate(135deg);}
+  .feature-detail{
+    max-height:0;
+    overflow:hidden;
+    transition:max-height 0.5s ease, opacity 0.4s ease, margin 0.4s ease;
+    opacity:0;
+    font-size:0.95rem;
+    line-height:1.9;
+    color:var(--parchment);
+    opacity:0.85;
+  }
+  .feature-card.open .feature-detail{
+    max-height:220px;
+    opacity:0.85;
+    margin-top:1rem;
+  }
+
+  /* ---------- FLAGSHIP ---------- */
+  .flagship{
+    background:var(--ink);
+    padding:7rem 1.5rem;
+    text-align:center;
+  }
+  .flagship-label{
+    font-family:'Aref Ruqaa',serif;
+    font-size:clamp(1.8rem,5vw,2.8rem);
+    color:var(--gold-soft);
+  }
+  .flagship-sub{
+    max-width:520px;
+    margin:1.5rem auto 0;
+    font-size:1.05rem;
+    line-height:2;
+    color:var(--parchment);
+    opacity:0.9;
+  }
+  .flagship-demo{
+    max-width:420px;
+    margin:3rem auto 0;
+    background:var(--ink-deep);
+    border:1px solid rgba(201,160,80,0.25);
+    border-radius:4px;
+    padding:1.5rem;
+    text-align:right;
+  }
+  .flagship-demo .row{
+    display:flex;
+    justify-content:space-between;
+    font-size:0.9rem;
+    padding:0.5rem 0;
+    border-bottom:1px solid rgba(201,160,80,0.12);
+  }
+  .flagship-demo .row:last-child{border-bottom:none;}
+  .flagship-demo .label{color:var(--gold);}
+  .flagship-btn{
+    margin-top:2.2rem;
+    display:inline-block;
+    background:none;
+    border:1px solid var(--gold);
+    color:var(--gold-soft);
+    text-decoration:none;
+    padding:0.9rem 2.4rem;
+    font-family:'IBM Plex Sans Arabic',sans-serif;
+    font-size:0.95rem;
+    border-radius:2px;
+    cursor:pointer;
+    transition:background 0.3s ease, color 0.3s ease;
+  }
+  .flagship-btn:hover{background:var(--gold);color:var(--ink-deep);}
+
+  footer{
+    text-align:center;
+    padding:2.5rem 1.5rem;
+    font-size:0.85rem;
+    color:var(--parchment);
+    opacity:0.5;
+  }
+
+  @media (max-width:600px){
+    .story{padding:5rem 1.25rem;}
+    .flagship{padding:5rem 1.25rem;}
+  }
+</style>
+</head>
+<body>
+
+  <section class="hero">
+    <div class="hero-mark verse-font">مُترنِّم</div>
+    <div class="hero-verse">من محمد البرغوثي</div>
+    <p class="hero-tagline">حين يفهم الآلة وزن الشعر، لا يكتبه عنك، بل يسمعه معك</p>
+    <div class="hero-scroll"><div class="line"></div>انزل</div>
+  </section>
+
+  <section class="story">
+    <p>منذ قرون، كان الشاعر وحده يزن الحرف بأذنه، ويعرف الخلل قبل أن يكمل البيت. <span class="accent-word">مُترنِّم</span> لا يريد أن يأخذ منه هذه الأذن.</p>
+    <p>هو يجلس إلى جانبه فقط، يسمع البحر، يلمح الكسر، يهمس باقتراح، ويترك القرار الأخير حيث يجب أن يبقى، بين يدي صاحب القصيدة.</p>
+  </section>
+
+  <section class="features">
+    <div class="features-intro verse-font">ماذا تسمع الآلة حين تقرأ بيتك؟</div>
+    <div class="feature-grid" id="featureGrid">
+      <div class="feature-card">
+        <div class="feature-title">الوزن والقافية<span class="plus">+</span></div>
+        <div class="feature-detail">يحدد البحر والتفعيلات، ويشير بدقة إلى موضع أي خلل عروضي في الشطر.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title">المعنى<span class="plus">+</span></div>
+        <div class="feature-detail">يقرأ الصور الشعرية والدلالات، ويشرحها بلغة بسيطة دون أن يفرض تأويلاً واحداً.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title">المشاعر<span class="plus">+</span></div>
+        <div class="feature-detail">شوق، عتاب، فخر، غزل، يتعرف على الحالة الشعورية الغالبة على البيت أو القصيدة.</div>
+      </div>
+      <div class="feature-card">
+        <div class="feature-title">الأسلوب<span class="plus">+</span></div>
+        <div class="feature-detail">يقارن نَفَس النص بمدارس شعرية معروفة، كلاسيكية أو حديثة، ليخبرك أين يقف أسلوبك.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="flagship">
+    <div class="flagship-label verse-font">الشاعر والآلة</div>
+    <p class="flagship-sub">اكتب بيتك كما هو. الآلة تقرأه، تقترح تعديلاً واحداً يحفظ فكرتك، وأنت من يقرر إن كان يستحق القبول.</p>
+    <div class="flagship-demo">
+      <div class="row"><span class="label">الوزن</span><span>يحتاج تعديل</span></div>
+      <div class="row"><span class="label">القافية</span><span>لي</span></div>
+      <div class="row"><span class="label">الاقتراح</span><span>أنا شاعر الصمت طفل الليالي</span></div>
+    </div>
+    <a class="flagship-btn" href="poet-and-machine.html">جرّب الآن</a>
+  </section>
+
+  <footer>مُترنِّم — حيث يلتقي الحرف بالآلة</footer>
+
+<script>
+  document.querySelectorAll('.feature-card').forEach(card => {
+    card.addEventListener('click', () => {
+      const wasOpen = card.classList.contains('open');
+      document.querySelectorAll('.feature-card').forEach(c => c.classList.remove('open'));
+      if(!wasOpen) card.classList.add('open');
+    });
+  });
+</script>
+
+</body>
+</html>
