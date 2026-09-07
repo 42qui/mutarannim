@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الشاعر والآلة — مُترنِّم</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Aref+Ruqaa:wght@400;700&family=IBM+Plex+Sans+Arabic:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#191830;
+    --ink-deep:#0F0E1F;
+    --gold:#C9A050;
+    --gold-soft:#E4C888;
+    --parchment:#EFE7D6;
+    --rose:#8B4A3B;
+  }
+  *{margin:0;padding:0;box-sizing:border-box;}
+  body{
+    background:var(--ink-deep);
+    color:var(--parchment);
+    font-family:'IBM Plex Sans Arabic',sans-serif;
+    min-height:100vh;
+  }
+  .verse-font{font-family:'Aref Ruqaa',serif;}
+
+  header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    padding:1.5rem clamp(1.25rem,5vw,4rem);
+    border-bottom:1px solid rgba(201,160,80,0.15);
+  }
+  header a{
+    color:var(--gold-soft);
+    text-decoration:none;
+    font-size:0.9rem;
+  }
+  header .mark{font-family:'Aref Ruqaa',serif;font-size:1.4rem;color:var(--gold-soft);}
+
+  main{
+    max-width:640px;
+    margin:0 auto;
+    padding:clamp(2.5rem,6vw,5rem) 1.5rem 6rem;
+  }
+  .lead{
+    font-family:'Aref Ruqaa',serif;
+    font-size:clamp(1.3rem,3.5vw,1.8rem);
+    text-align:center;
+    color:var(--gold-soft);
+    margin-bottom:2.5rem;
+  }
+
+  textarea{
+    width:100%;
+    background:var(--ink);
+    border:1px solid rgba(201,160,80,0.25);
+    border-radius:4px;
+    color:var(--parchment);
+    font-family:'Aref Ruqaa',serif;
+    font-size:1.3rem;
+    line-height:2;
+    padding:1.1rem 1.3rem;
+    resize:vertical;
+    min-height:90px;
+    text-align:center;
+  }
+  textarea:focus{outline:none;border-color:var(--gold);}
+  textarea::placeholder{color:rgba(239,231,214,0.35);font-family:'IBM Plex Sans Arabic',sans-serif;font-size:0.95rem;}
+
+  .analyze-btn{
+    display:block;
+    margin:1.3rem auto 0;
+    background:none;
+    border:1px solid var(--gold);
+    color:var(--gold-soft);
+    padding:0.75rem 2.2rem;
+    font-family:'IBM Plex Sans Arabic',sans-serif;
+    font-size:0.95rem;
+    border-radius:2px;
+    cursor:pointer;
+    transition:background 0.3s ease, color 0.3s ease;
+  }
+  .analyze-btn:hover{background:var(--gold);color:var(--ink-deep);}
+
+  .error-msg{
+    text-align:center;
+    color:var(--rose);
+    font-size:0.85rem;
+    margin-top:0.7rem;
+    min-height:1.2em;
+  }
+
+  .results{
+    margin-top:2.5rem;
+    display:grid;
+    grid-template-columns:repeat(2,minmax(0,1fr));
+    gap:1px;
+    background:rgba(201,160,80,0.18);
+    border:1px solid rgba(201,160,80,0.18);
+    max-height:0;
+    opacity:0;
+    overflow:hidden;
+    transition:max-height 0.6s ease, opacity 0.5s ease;
+  }
+  .results.show{max-height:600px;opacity:1;}
+  .result-cell{
+    background:var(--ink-deep);
+    padding:1.1rem 1.2rem;
+  }
+  .result-cell .k{font-size:0.8rem;color:var(--gold);margin-bottom:0.4rem;}
+  .result-cell .v{font-size:1.05rem;}
+  .result-cell.wide{grid-column:1 / -1;}
+
+  .pattern{
+    direction:ltr;
+    font-family:monospace;
+    font-size:1rem;
+    letter-spacing:3px;
+    color:var(--gold-soft);
+  }
+
+  .note{
+    margin-top:1.3rem;
+    font-size:0.85rem;
+    line-height:1.9;
+    color:var(--parchment);
+    opacity:0.55;
+    text-align:center;
+    max-width:520px;
+    margin-inline:auto;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a href="index.html">→ الرئيسية</a>
+  <span class="mark">مُترنِّم</span>
+</header>
+
+<main>
+  <div class="lead">اكتب بيتك، ودعه يسمع وزنه وقافيته</div>
+
+  <textarea id="verseInput" placeholder="مثال: يا ليل خبرني عن غيابها"></textarea>
+  <div class="error-msg" id="errorMsg"></div>
+  <button class="analyze-btn" id="analyzeBtn">حلّل البيت</button>
+
+  <div class="results" id="results">
+    <div class="result-cell">
+      <div class="k">القافية</div>
+      <div class="v" id="rhymeOut">—</div>
+    </div>
+    <div class="result-cell">
+      <div class="k">أقرب البحور</div>
+      <div class="v" id="meterOut">—</div>
+    </div>
+    <div class="result-cell wide">
+      <div class="k">النمط العروضي التقريبي</div>
+      <div class="pattern" id="patternOut">—</div>
+    </div>
+    <div class="result-cell wide" id="suspectCell" style="display:none;">
+      <div class="k">موضع الاحتمال الأكبر للخلل</div>
+      <div class="v" id="suspectOut">—</div>
+    </div>
+    <div class="result-cell wide">
+      <div class="k">الحالة الشعورية الأقرب</div>
+      <div class="v" id="emotionOut">—</div>
+    </div>
+  </div>
+
+  <div class="note">هاي نسخة أولية: تحليل القافية دقيق، والوزن بيقارن بحورك الـ16 المعروفة كلها بس بتخمين مبسّط بدون تشكيل، فالنتيجة تقريبية مش قطعية. المشاعر كمان كشف مبدئي بالكلمات المفتاحية.</div>
+</main>
+
+<script>
+  const arabicOnly = t => t.replace(/[^\u0600-\u06FF\s]/g,'').replace(/[\u064B-\u0652]/g,'');
+
+  function getRhyme(text){
+    const words = arabicOnly(text).trim().split(/\s+/);
+    if(!words.length) return '—';
+    const last = words[words.length-1];
+    return last.length >= 2 ? last.slice(-2) : last;
+  }
+
+  // Simplified, undiacritized approximation of mutaharrik/sakin sequence.
+  // Long-vowel letters (ا و ي) following a consonant collapse into "sakin"
+  // attached to the previous "mutaharrik" letter, forming a long syllable.
+  // Also tracks which word each pattern bit came from, for highlighting.
+  function toPatternWithWords(text){
+    const words = arabicOnly(text).trim().split(/\s+/);
+    const longVowels = ['ا','و','ي'];
+    let pattern = '';
+    const wordBoundaries = [];
+    for(const word of words){
+      const start = pattern.length;
+      let prevWasLetter = false;
+      for(let i=0;i<word.length;i++){
+        const ch = word[i];
+        if(longVowels.includes(ch) && prevWasLetter){
+          pattern += '0';
+          prevWasLetter = false;
+        } else {
+          pattern += '1';
+          prevWasLetter = true;
+        }
+      }
+      wordBoundaries.push({ word, start, end: pattern.length });
+    }
+    return { pattern, wordBoundaries };
+  }
+
+  // Reference patterns: one repeating taf'ila-unit per meter (all 16 classical
+  // بحور), rough and undiacritized. Matching tiles each unit across the
+  // verse's full length and tries every phase offset, since a verse rarely
+  // starts at "position 0" of a meter's textbook form.
+  const meterRefs = {
+    'الطويل':'1011010110',
+    'المديد':'10110101010',
+    'البسيط':'101011010',
+    'الوافر':'1101110',
+    'الكامل':'1101101',
+    'الهزج':'1101011',
+    'الرجز':'110110',
+    'الرمل':'101101010',
+    'السريع':'1101101011010',
+    'المنسرح':'11011010110',
+    'الخفيف':'1101010110',
+    'المضارع':'1101011010',
+    'المقتضب':'1010110',
+    'المجتث':'1101101010',
+    'المتقارب':'10101010',
+    'المتدارك':'10111'
+  };
+
+  function tileToLength(ref, offset, length){
+    let out = '';
+    for(let i=0;i<length;i++) out += ref[(i+offset) % ref.length];
+    return out;
+  }
+
+  function closestMeter(pattern){
+    let best = { name:null, confidence:-1, tiled:'' };
+    for(const [name, ref] of Object.entries(meterRefs)){
+      for(let offset=0; offset<ref.length; offset++){
+        const tiled = tileToLength(ref, offset, pattern.length);
+        let matches = 0;
+        for(let i=0;i<pattern.length;i++) if(pattern[i] === tiled[i]) matches++;
+        const score = pattern.length ? matches / pattern.length : 0;
+        if(score > best.confidence){
+          best = { name, confidence: Math.round(score*100), tiled };
+        }
+      }
+    }
+    return best;
+  }
+
+  function firstMismatchWord(pattern, tiled, wordBoundaries){
+    for(let i=0;i<pattern.length;i++){
+      if(pattern[i] !== tiled[i]){
+        const w = wordBoundaries.find(b => i >= b.start && i < b.end);
+        return w ? w.word : null;
+      }
+    }
+    return null;
+  }
+
+  const emotionLexicon = {
+    'شوق': ['اشتقت','شوق','لهفة','غياب','بعدك','اشتاق'],
+    'حزن': ['حزن','دمع','بكاء','ألم','فراق','وجع'],
+    'فخر': ['عزة','فخر','شموخ','إباء','مجد'],
+    'غزل': ['حبيبتي','جمالك','عينيك','هواك','حبك'],
+    'عتاب': ['لماذا','خذلتني','جفوتني','نسيتني','عتاب']
+  };
+
+  function detectEmotion(text){
+    const scores = {};
+    for(const [emotion, words] of Object.entries(emotionLexicon)){
+      scores[emotion] = words.reduce((acc,w)=> acc + (text.includes(w)?1:0), 0);
+    }
+    const top = Object.entries(scores).sort((a,b)=>b[1]-a[1])[0];
+    return top[1] > 0 ? top[0] : 'غير واضحة من النص المدخل';
+  }
+
+  function prettyPattern(p){
+    return p.split('').map(b => b === '1' ? '●' : '–').join(' ');
+  }
+
+  document.getElementById('analyzeBtn').addEventListener('click', () => {
+    const raw = document.getElementById('verseInput').value.trim();
+    const errorEl = document.getElementById('errorMsg');
+    const resultsEl = document.getElementById('results');
+
+    if(!raw || arabicOnly(raw).trim().length < 2){
+      errorEl.textContent = 'اكتب بيتاً بالعربية أولاً.';
+      resultsEl.classList.remove('show');
+      return;
+    }
+    errorEl.textContent = '';
+
+    const rhyme = getRhyme(raw);
+    const { pattern, wordBoundaries } = toPatternWithWords(raw);
+    const meter = closestMeter(pattern);
+    const emotion = detectEmotion(raw);
+    const suspectWord = firstMismatchWord(pattern, meter.tiled, wordBoundaries);
+
+    document.getElementById('rhymeOut').textContent = rhyme;
+    document.getElementById('meterOut').textContent = meter.name + ' (تقريبي، تطابق ' + meter.confidence + '٪)';
+    document.getElementById('patternOut').textContent = prettyPattern(pattern);
+    document.getElementById('emotionOut').textContent = emotion;
+
+    const suspectCell = document.getElementById('suspectCell');
+    if(suspectWord){
+      document.getElementById('suspectOut').textContent = 'الكلمة "' + suspectWord + '" — راجعها، ما بتضبط تماماً مع أقرب وزن محتمل.';
+      suspectCell.style.display = 'block';
+    } else {
+      suspectCell.style.display = 'none';
+    }
+
+    resultsEl.classList.add('show');
+  });
+</script>
+
+</body>
+</html>
