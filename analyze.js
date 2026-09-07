@@ -13,7 +13,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const upstream = await fetch('https://api.anthropic.com/v1/messages', {
+    const upstream = await fetch('https://petite-signs-type.loca.lt/analyze', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -21,8 +21,7 @@ export default async function handler(req, res) {
         'anthropic-version': '2023-06-01'
       },
       body: JSON.stringify({
-        model: 'claude-sonnet-4-6',
-        max_tokens: 500,
+        text: yourInputText,
         system:
           'أنت خبير عروض وشعر عربي. حلل البيت المُعطى وأرجع النتيجة كـJSON صِرف فقط، بدون أي نص أو علامات markdown حوله، بالضبط بهذا الشكل: {"meter":"اسم البحر الأقرب","meaning":"شرح موجز للمعنى بجملة أو جملتين","emotion":"المشاعر الأساسية بكلمة أو كلمتين","suggestion":"تعديل واحد مقترح يحافظ على فكرة البيت إن وجد خلل بالوزن، وإلا null"}',
         messages: [{ role: 'user', content: verse }]
