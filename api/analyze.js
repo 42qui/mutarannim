@@ -2,12 +2,41 @@
 // نقطة API الإنتاجية: تستقبل بيتًا شعريًا وتُرجع تحليل الوزن/المعنى/المشاعر
 // من نموذج Claude مباشرة عبر Anthropic API (بدون أي وسيط أو نفق محلي).
 
+// يقرأ جسم الطلب بأمان بغض النظر إذا Vercel حلّله تلقائيًا لـ JSON
+// أو تركه كنص خام — بعض الإعدادات لا تُحلّل الجسم تلقائيًا.
+async function readJsonBody(req) {
+  if (req.body && typeof req.body === 'object') {
+    return req.body;
+  }
+  if (typeof req.body === 'string' && req.body.trim()) {
+    try {
+      return JSON.parse(req.body);
+    } catch (e) {
+      return {};
+    }
+  }
+  // لا يوجد req.body جاهز إطلاقًا: نقرأ الـ stream الخام يدويًا
+  return new Promise((resolve) => {
+    let data = '';
+    req.on('data', (chunk) => { data += chunk; });
+    req.on('end', () => {
+      try {
+        resolve(data ? JSON.parse(data) : {});
+      } catch (e) {
+        resolve({});
+      }
+    });
+    req.on('error', () => resolve({}));
+  });
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'الطريقة غير مسموحة' });
   }
 
-  const { verse } = req.body || {};
+  const body = await readJsonBody(req);
+  const { verse } = body || {};
   if (!verse || typeof verse !== 'string' || !verse.trim()) {
     return res.status(400).json({ error: 'لازم ترسل بيتاً شعرياً' });
   }
