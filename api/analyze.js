@@ -1,4 +1,3 @@
-
 // api/analyze.js
 // نقطة API الإنتاجية: تستقبل بيتًا شعريًا وتُرجع تحليل الوزن/المعنى/المشاعر
 // من نموذج Google Gemini (الحصة المجانية) عبر Generative Language API.
@@ -54,7 +53,7 @@ export default async function handler(req, res) {
  
   try {
     const upstream = await fetch(
-      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=' +
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=' +
         process.env.GEMINI_API_KEY,
       {
         method: 'POST',
@@ -98,4 +97,3 @@ export default async function handler(req, res) {
     return res.status(500).json({ error: 'تعذّر الاتصال بالنموذج' });
   }
 }
- 
